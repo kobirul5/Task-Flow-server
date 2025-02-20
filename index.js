@@ -35,6 +35,10 @@ async function run() {
     const userCollection = client.db("TaskDB").collection("Users")
     const taskCollection = client.db("TaskDB").collection("Tasks")
 
+    app.get('/all-tasks', async (req,res)=>{
+      const result = await taskCollection.find().toArray();
+      res.send(result)
+    })
 
     app.post('/task-user', async (req, res)=>{
       const task = req.body;
