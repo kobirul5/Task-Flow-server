@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 4000
 
@@ -34,6 +34,7 @@ async function run() {
 
     const userCollection = client.db("TaskDB").collection("Users")
     const taskCollection = client.db("TaskDB").collection("Tasks")
+    
 
     app.get('/all-tasks', async (req,res)=>{
       const result = await taskCollection.find().toArray();
@@ -50,6 +51,25 @@ async function run() {
       const result = await taskCollection.insertOne(task)
       res.send(result)
     })
+    app.put('/task-update/:id', async (req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const options = { upsert: true };
+      const updatedTask = req.body;
+
+      const task = {
+        $set:{
+              title:updatedTask.title,
+              description:updatedTask.description,
+              category:updatedTask.category,
+              email:updatedTask.email,
+              timestamp:updatedTask.timestamp,
+        }
+      }
+      const result = await taskCollection.updateOne(filter, task, options)
+      res.send(result)
+    })
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
