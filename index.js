@@ -1,4 +1,5 @@
 require('dotenv').config()
+const { WebSocketServer } = require('ws')
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -11,6 +12,7 @@ app.use(cors())
 app.get("/", (req, res)=>{
     res.send("server is running")
 })
+
 
 
 
@@ -89,6 +91,15 @@ run().catch(console.dir);
 
 
 
-app.listen(port, ()=>{
-    console.log(`server is runnig on port : ${port}`)
+const server = app.listen(port, ()=>{
+  console.log(`server is runnig on port : ${port}`)
+})
+
+const wss = new WebSocketServer({server})
+
+wss.on("connection", (ws)=>{
+  ws.on("message", (data)=>{
+    console.log("data From client: ", data);
+    ws.send("thanks")
+  })
 })
